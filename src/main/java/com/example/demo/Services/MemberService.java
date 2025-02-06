@@ -7,12 +7,17 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.Model.Membership;
+import com.example.demo.Model.Transaction;
 import com.example.demo.Repository.MemberRepo;
 
 @Service
 public class MemberService {
 @Autowired
 private MemberRepo mr;
+@Autowired
+private TransactionService ts;
+
 
 public void saveMember(com.example.demo.Model.Member m) {
 	mr.save(m);
@@ -33,6 +38,9 @@ public void updateMember(com.example.demo.Model.Member m,int id) {
 	
 }
 public void deleteMember(int id) {
+	com.example.demo.Model.Member mem=getMember(id);
+	ts.deleteTransactionsByMember(mem);
+	
 	mr.deleteById(id);
 }
 public void updateMembershipStatus(int id) {

@@ -109,7 +109,11 @@ public boolean updateMember(@PathVariable int id,@RequestBody com.example.demo.M
 @CrossOrigin
 @DeleteMapping("/delete-member/{id}")
 public boolean deleteMember(@PathVariable int id) {
+	
+com.example.demo.Model.Member m=ms.getMember(id);
+memSer.deleteMembershipByMember(m);
 	ms.deleteMember(id);
+	
 	return true;
 }
 @CrossOrigin
@@ -184,7 +188,8 @@ public void expireMembership() {
 		String date1=m.getEndDate();
 		LocalDate date=LocalDate.of( Integer.parseInt(date1.subSequence(0, 4).toString()),Integer.parseInt(date1.subSequence(5, 7).toString()),Integer.parseInt(date1.subSequence(8, 10).toString()));
         LocalDate curDate=LocalDate.now();
-        if(curDate.isAfter(date)) {
+        DateTimeFormatter f=DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        if(curDate.isAfter(date)||f.format(curDate).equals(f.format(date))) {
         	memSer.expireMembership(m.getId());
         }
 		}
@@ -200,6 +205,7 @@ public Transaction getPayment(@PathVariable int id) {
 @CrossOrigin
 @GetMapping("/get-memberships")
 public List<Membership> getMemberships(){
+	expireMembership();
 	List<Membership> activeM=new ArrayList<Membership>();
 	for(Membership m:memSer.getMemberships()) {
 		if(m.getActiveStatus().equals("active")) {
@@ -211,6 +217,7 @@ public List<Membership> getMemberships(){
 @CrossOrigin
 @GetMapping("/deactive-members")
 public List<com.example.demo.Model.Member> getDeactiveMembers(){
+	expireMembership();
 	List<com.example.demo.Model.Member> ml=new ArrayList<com.example.demo.Model.Member>();
 	for(com.example.demo.Model.Member m:ms.getMembers()) {
 		if(m.getMembershipStatus().equals("deactive")) {
@@ -229,6 +236,16 @@ if(i<=0) {
 else {
 	return i;
 }
+}
+@CrossOrigin
+@PutMapping("/chnage-plan/{id}")
+public boolean changeMembership(@RequestBody Membership m,@PathVariable int id) {
+	Plan p=ps.getPlan(m.getPa());
+	m.setP(p);
+memSer.changeMembership(id, m);
+
+	
+	return true;
 }
 
 }

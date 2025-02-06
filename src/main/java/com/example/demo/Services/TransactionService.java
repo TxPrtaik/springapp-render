@@ -25,4 +25,10 @@ public Transaction getTransaction(int id) {
 	Optional<Transaction> ot=tr.findById(id);
 	return ot.get();
 }
+public void deleteTransactionsByMember(Member m) {
+ List<Transaction> ml= tr.getTransactionByMember(m);
+ for(Transaction t:ml) {
+	 tr.deleteById(t.getId());
+ }
+}
 }
